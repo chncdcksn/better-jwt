@@ -1,0 +1,22 @@
+{
+  "name": "better-jwt",
+  "version": "0.0.1",
+  "main": "out.js",
+  "author": "Chance Dickson <me@chncdcksn.com>",
+  "license": "BSD-3-Clause",
+  "homepage": "https://github.com/chncdcksn/better-jwt#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/chncdcksn/better-jwt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chncdcksn/better-jwt/issues"
+  },
+  "scripts": {
+    "compile": "babel index.js -o out.js",
+    "prepublish": "npm run compile"
+  },
+  "devDependencies": {
+    "babel": "^5.8.23"
+  }
+}
