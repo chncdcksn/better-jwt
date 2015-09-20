@@ -15,13 +15,14 @@ let ExpiredJWTError = errorType("ExpiredJWTError");
 let isFunc = (func) => func &&
   ({}).toString.call(func) === "[object Function]";
 
-let encode = (string) => new Buffer(string)
+let b64Encode = (string) => new Buffer(string)
   .toString("base64")
   .replace("=", "")
   .replace("+", "-")
   .replace("/", "_");
 
-let decode = (string, enc) => string.length % 4 > 0 ? decode(string + "=") :
+let b64Decode = (string, enc) => string.length % 4 > 0 ?
+  b64Decode(string + "=") :
   new Buffer(string.replace("-", "+").replace("_", "/"), "base64")
     .toString(enc);
 
@@ -50,9 +51,9 @@ let sign = (payload, secret, algo, opts) => {
     issued: Math.floor(Date.now() / 1000),
     expires: opts.expires
   };
-  let body = encode(JSON.stringify(header)) + "." +
-    encode(JSON.stringify(payload));
-  let signature = encode(sign(body, secret));
+  let body = b64Encode(JSON.stringify(header)) + "." +
+    b64Encode(JSON.stringify(payload));
+  let signature = b64Encode(sign(body, secret));
   return body + "." + signature;
 };
 
@@ -73,21 +74,30 @@ let verify = (jwt, secret, algo, opts) => {
   if (parts.length !== 3) {
     throw MalformedJWTError("Malformed JWT.");
   }
-  let signature = decode(parts[2]);
+  let signature = b64Decode(parts[2]);
   if (!verify(parts[0] + "." + parts[1], secret, signature)) {
     throw InvalidJWTError("JWT has invalid signature.");
   }
-  let header = decode(parts[0]);
+  let header = b64Decode(parts[0]);
   if (header.expires &&
       Math.floor(Date.now() / 1000) > header.issued + header.expires) {
     throw ExpiredJWTError("JWT is expired.");
   }
-  return JSON.parse(decode(parts[1]));
+  return JSON.parse(b64Decode(parts[1]));
+};
+
+let decode = (jwt) => {
+  let parts = jwt.split(".");
+  if (parts.length !== 3) {
+    throw MalformedJWTError("Malformed JWT.");
+  }
+  return JSON.parse(b64Decode(parts[1]));
 };
 
 export {
   sign,
   verify,
+  decode,
   InvalidAlgorithmError,
   MalformedJWTError,
   InvalidJWTError,
