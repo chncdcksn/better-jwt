@@ -1,6 +1,6 @@
 {
   "name": "better-jwt",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "out.js",
   "author": "Chance Dickson <me@chncdcksn.com>",
   "license": "BSD-3-Clause",

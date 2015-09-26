@@ -15,16 +15,22 @@ let ExpiredJWTError = errorType("ExpiredJWTError");
 let isFunc = (func) => func &&
   ({}).toString.call(func) === "[object Function]";
 
-let b64Encode = (string) => new Buffer(string)
-  .toString("base64")
-  .replace("=", "")
-  .replace("+", "-")
-  .replace("/", "_");
+let b64Encode = (string) => {
+  return new Buffer(string)
+    .toString("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+};
 
-let b64Decode = (string, enc) => string.length % 4 > 0 ?
-  b64Decode(string + "=") :
-  new Buffer(string.replace("-", "+").replace("_", "/"), "base64")
-    .toString(enc);
+let b64Decode = (string, enc) => {
+  if (string.length % 4 > 0) {
+    return b64Decode(string + "=");
+  } else {
+    return new Buffer(string.replace(/-/g, "+").replace(/\_/g, "/"), "base64")
+      .toString(enc);
+  }
+};
 
 let genHmacSign = (algo) => (data, secret) => {
   return Crypto.createHmac(algo, secret).update(data).digest("base64");
